@@ -1,16 +1,20 @@
 /*
  * класс, описывающий матрицу размера rows*columns
  */
-final public class Matrix {
+public class Matrix {
 
-    private final int[][] matrix;
-    private final int rows;
-    private final int columns;
+    protected int[][] matrix;
+    protected int rows;
+    protected int columns;
 
     public Matrix(int rowCount, int columnCount) {
         rows = rowCount;
         columns = columnCount;
         matrix = new int[rowCount][columnCount];
+    }
+
+    public Matrix(){
+        this(0,0);
     }
 
     public Matrix(int[][] matrix) {
@@ -25,11 +29,12 @@ final public class Matrix {
                 this.matrix[row][column] = matrix[row][column];
     }
 
+
     private Matrix(Matrix other) {
         this(other.matrix);
     }
 
-    private boolean checkInputMatrix() {
+    private boolean checkMatrix() {
         if (matrix == null)
             return false;
         else
@@ -57,7 +62,7 @@ final public class Matrix {
 
     public Matrix multiplyMatrix(Matrix right) {
         Matrix left = this;
-        if (!left.checkInputMatrix() || !right.checkInputMatrix()) {
+        if (!left.checkMatrix() || !right.checkMatrix()) {
             throw new IllegalArgumentException();
         }
         if (left.columns != right.rows) {
