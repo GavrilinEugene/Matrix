@@ -1,117 +1,106 @@
 /*
  * класс, описывающий матрицу размера rows*columns
  */
-public class Matrix {
+final public class Matrix {
 
-    private int[][] matrix;
+    private final int[][] matrix;
+    private final int rows;
+    private final int columns;
 
     public Matrix(int rowCount, int columnCount) {
+        rows = rowCount;
+        columns = columnCount;
         matrix = new int[rowCount][columnCount];
     }
 
-    public Matrix() {
-        this(0, 0);
+    public Matrix(int[][] matrix) {
+        if (matrix == null)
+            matrix = new int[0][0];
+
+        rows = matrix.length;
+        columns = matrix[0].length;
+        this.matrix = new int[rows][columns];
+        for (int row = 0; row < rows; row++)
+            for (int column = 0; column < columns; column++)
+                this.matrix[row][column] = matrix[row][column];
     }
 
-    public int getRowCount() {
-        if (!checkMatrix()) {
-            throw new NullPointerException();
-        }
-        return matrix.length;
+    private Matrix(Matrix other) {
+        this(other.matrix);
     }
 
-    public int getColumnCount() {
-        if (!checkMatrix()) {
-            throw new NullPointerException();
-        }
-        return matrix[0].length;
-    }
-
-    private boolean checkMatrix() {
-        return this != null && matrix != null;
+    private boolean checkInputMatrix() {
+        if (matrix == null)
+            return false;
+        else
+            return true;
     }
 
     public int getElement(int row, int column) {
-        if (!checkMatrix() || !checkColumnRange(column) || !checkRowRange(row)) {
-            throw new IllegalArgumentException();
-        }
         return matrix[row][column];
     }
 
     public void setElement(int row, int column, int element) {
-        if (!checkMatrix() || !checkColumnRange(column) || !checkRowRange(row))
-            throw new IllegalArgumentException();
         matrix[row][column] = element;
     }
 
-    private boolean checkColumnRange(int row) {
-        return row < getRowCount() || row >= 0;
-    }
-
-    private boolean checkRowRange(int column) {
-        return column < getColumnCount() || column >= 0;
-    }
-
     public Matrix add(Matrix other) {
-        if (!checkMatrix() || !other.checkMatrix()) {
-            throw new IllegalArgumentException();
-        }
-        if (other.getRowCount() != this.getRowCount() || other.getColumnCount() != this.getColumnCount()) {
+        if (other.rows != this.rows || other.columns != this.columns)
             throw new RuntimeException("Illegal matrix dimensions.");
-        }
 
-        Matrix ret = new Matrix(getRowCount(), getColumnCount());
-        for (int row = 0; row < getColumnCount(); row++) {
-            for (int column = 0; column < getRowCount(); column++) {
+        Matrix ret = new Matrix(rows, columns);
+        for (int row = 0; row < rows; row++)
+            for (int column = 0; column < columns; column++)
                 ret.setElement(row, column, this.getElement(row, column) + other.getElement(row, column));
-            }
-        }
         return ret;
     }
 
     public Matrix multiplyMatrix(Matrix right) {
         Matrix left = this;
-        if (!left.checkMatrix() || !right.checkMatrix()) {
+        if (!left.checkInputMatrix() || !right.checkInputMatrix()) {
             throw new IllegalArgumentException();
         }
-        if (left.getColumnCount() != right.getColumnCount()) {
-            throw new RuntimeException("Illegal matrix dimensions.");
+        if (left.columns != right.rows) {
+            throw new IllegalArgumentException();
         }
 
-        Matrix ret = new Matrix(left.getRowCount(), right.getColumnCount());
-        for (int row = 0; row < left.getRowCount(); row++) {
-            for (int column = 0; column < right.getColumnCount(); column++) {
-                ret.setElement(row, column, left.getRow(row).multiply(right.getColumn(column)));
+        Matrix ret = new Matrix(left.rows, right.columns);
+        for (int row = 0; row < left.rows; row++) {
+            for (int column = 0; column < right.columns; column++) {
+                ret.setElement(row, column, multiplyVector(left.getRow(row), right.getColumn(column)));
             }
         }
         return ret;
     }
 
-    private Vector getColumn(int column) {
-        Vector ret = new Vector(getRowCount());
-        for (int row = 0; row < getRowCount(); row++) {
-            ret.setElement(row, getElement(row, column));
+    private static int multiplyVector(int[] row, int[] column) {
+        int ret = 0;
+        for(int index = 0; index < row.length; index++)
+            ret += row[index]*column[index];
+        return ret;
+    }
+
+    private int[] getColumn(int column) {
+        int[] ret = new int[rows];
+        for (int row = 0; row < rows; row++) {
+            ret[row] = matrix[row][column];
         }
         return ret;
     }
 
-    private Vector getRow(int rowNumber) {
-        Vector ret = new Vector(getColumnCount());
-        for (int column = 0; column < getColumnCount(); column++) {
-            ret.setElement(column, getElement(rowNumber, column));
-        }
-        return ret;
+    private int[] getRow(int rowNumber) {
+        return matrix[rowNumber];
     }
 
-    public int calculateDeterminant() {
-        if (!checkMatrix() || !isSquareMatrix()) {
-            throw new RuntimeException();
+    public boolean equals(Matrix other) {
+        if (columns != other.columns || rows != other.rows) {
+            return false;
         }
-        MinorDeterminantMethod algorithm = new MinorDeterminantMethod();
-        return algorithm.calculate(this);
+        for (int row = 0; row < rows; row++)
+            for (int column = 0; column < columns; column++)
+                if (other.matrix[row][column] != matrix[row][column])
+                    return false;
+        return true;
     }
 
-    private boolean isSquareMatrix() {
-        return getColumnCount() == getRowCount();
-    }
 }
