@@ -3,6 +3,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class MatrixTest {
+
     @Test
     public void multiplyMatrix() throws Exception {
         Matrix first = MatrixCreator.createFromArray(new int[][]{{1, 2}, {1, 2}});

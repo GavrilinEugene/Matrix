@@ -1,7 +1,7 @@
 /*
  * класс, описывающий матрицу размера rows*columns
  */
-public class Matrix {
+public class Matrix implements Cloneable {
 
     private int[][] matrix;
 
@@ -18,6 +18,17 @@ public class Matrix {
             throw new NullPointerException();
         }
         return matrix.length;
+    }
+
+    public Matrix clone() throws CloneNotSupportedException {
+        Matrix clone = new Matrix();
+        try {
+            clone = (Matrix)super.clone();
+        }
+        catch (CloneNotSupportedException e) {
+            // This should never happen
+        }
+        return clone;
     }
 
     public int getColumnCount() {
