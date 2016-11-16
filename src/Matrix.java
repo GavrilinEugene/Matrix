@@ -20,15 +20,15 @@ public class Matrix implements Cloneable {
         return matrix.length;
     }
 
-    public Matrix clone() throws CloneNotSupportedException {
-        Matrix clone = new Matrix();
-        try {
-            clone = (Matrix)super.clone();
+    @Override
+    public Matrix clone() {
+        Matrix ret = new Matrix(getRowCount(), getColumnCount());
+        for (int row = 0; row < getRowCount(); row++) {
+            for (int column = 0; column < getColumnCount(); column++) {
+                ret.setElement(row, column, matrix[row][column]);
+            }
         }
-        catch (CloneNotSupportedException e) {
-            // This should never happen
-        }
-        return clone;
+        return ret;
     }
 
     public int getColumnCount() {
